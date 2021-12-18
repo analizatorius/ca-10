@@ -1,10 +1,14 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>User_looser</title>
 </head>
-<body>
-<h>Hello, {{name|capitalize}}</h>
-</body>
-</html>
+
+    <body>
+    <h>Hello, {{name|capitalize}}</h>
+    </body>
+{% endblock %}
