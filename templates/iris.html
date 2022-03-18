@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<h1>Enter petal data</h1>
+<br/><br/><br/>
+<form method="POST" ">
+    {{ form.csrf_token }}
+
+    {{ form.sepal_length.label(class="form-label") }}
+    {{ form.sepal_length(class="form-control") }}
+    <ul>
+        {% for error in form.sepal_length.errors %}
+            <li style="color:red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+    <br/>
+    {{ form.sepal_width.label(class="form-label") }}
+    {{ form.sepal_width(class="form-control") }}
+    <ul>
+        {% for error in form.sepal_width.errors %}
+            <li style="color:red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+    <br/>
+    {{ form.petal_length.label(class="form-label") }}
+    {{ form.petal_length(class="form-control") }}
+    <ul>
+        {% for error in form.petal_length.errors %}
+            <li style="color:red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+    <br/>
+    {{ form.petal_width.label(class="form-label") }}
+    {{ form.petal_width(class="form-control") }}
+    <ul>
+        {% for error in form.petal_width.errors %}
+            <li style="color:red;">{{ error }}</li>
+        {% endfor %}
+    </ul>
+
+    <br/>
+    {{ form.submit(class="btn btn-primary") }}
+
+{% endblock %}
