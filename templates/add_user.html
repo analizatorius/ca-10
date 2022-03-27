@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-success show" role="alert">
+         {{ message }}
+        </div>
+    {% endfor %}
+
+
+    {% if name %}
+        <h1> {{ name }} is in a bag.</h1>
+        <br/>
+    {% for user in all_users %}
+        #{{ user.id}}.  {{ user.name }} - {{ user.email }}<br/>
+    {% endfor %}
+
+    {% else %}
+        <h1>User list:</h1>
+        <br/>
+        <div class="shadow p-3 mb-5 bg-body rounded">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+            <br/>
+
+
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control") }}
+            <br/>
+
+            {{ form.submit(class="btn btn-primary") }}
+
+            <form/>
+            <div/>
+
+    <br/><br/><br/>
+     <table class="table table-hover table-bordered">
+         <tr>
+        {% for user in all_users %}
+            <td>#{{ user.id}}.  {{ user.name }} - {{ user.email }}<td/>
+        {% endfor %}
+         </tr>
+     </table>
+
+
+
+    {% endif %}
+
+{% endblock %}
