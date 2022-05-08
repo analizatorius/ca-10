@@ -32,6 +32,15 @@
             {{ form.email(class="form-control") }}
             <br/>
 
+            {{ form.profile_pic.label() }}
+                {{ form.profile_pic(class="form-control-file") }}
+                {% if form.profile_pic.errors %}
+                    {% for error in form.profile_pic.errors %}
+                        <span class="text-danger">{{ error }}</span></br>
+                    {% endfor %}
+                {% endif %}
+            <br/>
+
             {{ form.submit(class="btn btn-primary") }}
 
             <form/>

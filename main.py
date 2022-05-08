@@ -1,16 +1,24 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, redirect, url_for, flash, request
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Email
+from flask_wtf.file import FileField, FileAllowed
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import secrets
+from PIL import Image
+import os
 import pickle
 
 
 # Create Flask instance
 app = Flask(__name__)
-# Add DB
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+# Old sqlite db
+#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+#mysql db
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:##Sqshinemylight@localhost/wb_users"
 # Create a secret key
 app.config["SECRET_KEY"] = "much_secret"
 
@@ -23,6 +31,7 @@ class Users(db.Model):
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(200), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
 
     # Create string
     def __repr__(self):
@@ -31,6 +40,7 @@ class Users(db.Model):
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email(message="Insert valid email")])
+    profile_pic = FileField('Upload profile picture(using jpg or png formats)', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField("submit")
 
 
@@ -58,21 +68,39 @@ def index():
 def add_user():
     name = None
     form = UserForm()
+    user = Users.query.filter_by(email=form.email.data).first()
     if form.validate_on_submit():
         #checks if user with email already exists if not, proceeds
-        user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
             user = Users(name=form.name.data, email=form.email.data)
+            if form.profile_pic.data:
+                profile_pic = save_picture(form.profile_pic.data)
+                user.profile_pic = profile_pic
             db.session.add(user)
             db.session.commit()
         name = form.name.data
+
         form.name.data = ""
         form.email.data = ""
+        form.profile_pic.data = None
         flash("User added successfully")
 
+    profile_pic = url_for('static', filename='profile_pics/' + user.nuotrauka)
     all_users = Users.query.order_by(Users.date_added)
-    return render_template("add_user.html", form=form, name=name, all_users=all_users)
+    return render_template("add_user.html", form=form, name=name, all_users=all_users, profile_pic=profile_pic)
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile.pics', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
 
 @app.route("/user/<name>")
 def user(name):
